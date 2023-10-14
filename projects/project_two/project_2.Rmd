@@ -181,7 +181,7 @@ qqline(augmented_fit$.resid, col = "red")
 1) Add and commit this document (5 pts)
 
 ```
-#Commands here
+#I have been able to commit it fine, but I am having issues with pushing the changes to github. It says I dont have passworth authentication so I am going to try resetting my passowrd and trying again.
 ```
 
 2) Push your changes to github (10 pts)
