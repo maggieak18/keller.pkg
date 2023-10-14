@@ -181,7 +181,7 @@ qqline(augmented_fit$.resid, col = "red")
 1) Add and commit this document (5 pts)
 
 ```
-#I have been able to commit it fine, but I am having issues with pushing the changes to github. It says I dont have passworth authentication so I am going to try resetting my passowrd and trying again.
+#I clicked the file in the git area and then clicked commit and added a commit statement
 ```
 
 2) Push your changes to github (10 pts)
@@ -192,6 +192,8 @@ qqline(augmented_fit$.resid, col = "red")
 #remote: Support for password authentication was removed on August 13, 2021.
 remote: Please see https://docs.github.com/en/get-started/getting-started-with-git/about-remote-repositories#cloning-with-https-urls for information on currently recommended modes of authentication.
 fatal: Authentication failed for 'https://github.com/maggieak18/keller.pkg.git/'
+
+#so I had to make another new personal access token and am trying again
 ```
 
 
