@@ -1,0 +1,197 @@
+---
+title: "Project Two"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+Due Oct. 13 at 11:59 PM. 
+
+For this first part of the exam, you can either use `surveys_complete.csv` or your own data. If you are using your own data, you must have data in which you think you have a numerical predictor variable and a numerical response variable. If you are using `surveys_complete`, you can use weight and hindfoot_length for this.
+
+Save this file in your `projects` directory. You can either save it in a project two subdirectory, or just put it in projects. Either way is fine.
+
+
+1) Load in your data. Which variable will you be using as a predictor, and which as a response? (5 pts)
+
+```{r}
+frog_kinematics <- read_excel("kinematic_raw_data.xlsx")
+
+frog_kinematics
+```
+
+```
+# actual_angle will be the predictor and speed_cm_sec will be the response
+```
+
+2) Plot the two against each other with a scatter plot. Do the data appear to be related linearly? (5 pts)
+
+
+```{r}
+ggplot(data = frog_kinematics, mapping = aes(x = actual_angle, y = speed_cm_sec)) +geom_point()
+```
+
+```
+#The data do not appear to be related linearly
+```
+
+
+3) Fit the linear model. View the summary. (5 pts)
+
+
+```{r}
+model_fit <- lm(speed_cm_sec ~ actual_angle, data = frog_kinematics)
+
+summary(model_fit)
+```
+
+4) Does the summary make sense when you compare it to the plot you made? Does our model have good predictive power? Evaluate the residual standard error, intercept, and R-Squared in particular. Would you say your predictor predicts the response?  (10 pts)
+
+
+```
+#The summary does make sense compared to the plot I made because there didn't appear to be a strong linear relationship between the data points. The r-squared value is very low which indicates that there is a very small percentage of the response that can be predicted by the predictor. The residual standard error is also extremely high compared to the scale of values in this set. This large of an error limits the models predictive power. What is interesting is that the p value is highly significant. When looking at the estimate, however, the angle that shows significant is about 1 degree, so I would not consider it biologically significant in the context of this study. The intercept predicts that at an angle of zero, the velocity would be 1.59
+```
+
+
+5) Plot the model on the graph. Increase the size of the text so it is comfortably readable at 5 feet. Make sure axis labels are readable and not overlapping with one another. (5 pts)
+
+```{r}
+
+ggplot(data = frog_kinematics, mapping = aes(x = actual_angle, y = speed_cm_sec)) +geom_point() +geom_smooth(method = "lm") +theme(text = element_text(size = 45))
+
+
+```
+
+
+6) Check the normality of the residuals. Do they look OK? Are we violating assumptions? (5 pts)
+
+```{r}
+
+augmented_fit <- augment(model_fit) 
+
+qqnorm(augmented_fit$.resid)
+
+qqline(augmented_fit$.resid, col = "red")
+
+#the residuals are not normally distributed. Even though a good bit of them are on the line in the middle, on the two extremes, they all lie above the line. This means that we are violating assumptions that the data are linearly related, and that the data has equal variance across groups.
+
+```
+
+Why is normality of residuals important? 
+
+```{r}
+
+#the normality of residuals is important because that is one of the basic assumptions of linear modeling. The data itself does not have to be normally distributed, but the residuals do. Otherwise, you are trying to predict outcomes with a model that does not accurately describe the trends of your data set.
+
+```
+
+7) If you are using `surveys_complete`: Is there interspecific variation in the linear model? Hint: look at our prior work with facet plots. (15 pts) 
+
+If you are *not* using  `surveys_complete`: Do you think there are groupings within your data that may have a separate linear model? Try grouping the data by that variable and redoing the lm. If this would not make sense for your data, you may also attempt to do multiple predictor variables. (15 pts)
+
+```{r}
+#I am going to do multiple predictor variables
+
+model_fit <- lm(speed_cm_sec ~ actual_angle + ablation_condition, data = frog_kinematics)
+
+summary(model_fit)
+
+augmented_fit <- augment(model_fit) 
+
+qqnorm(augmented_fit$.resid)
+
+qqline(augmented_fit$.resid, col = "red")
+
+ggplot(data = frog_kinematics, mapping = aes(x = actual_angle, y = speed_cm_sec, color = ablation_condition)) +geom_point() +scale_color_manual(values = c("red", "blue")) +geom_smooth(method = "lm")
+
+
+#The addition of another predictor variable, in this case, the sensory input to the lateral line system, did not yield a response from the model that indicates it is a linear relationship, if a relationship exists at all.
+```
+
+## Part Two
+
+In this portion, you are free to use your own data if you have a categorical predictor variable and a response variable. Otherwise, you may use the columns sex and weight in `surveys_complete`
+
+1) First, plot the data grouped by sex (5 pts)
+
+```{r}
+
+frog_kinematics %>% 
+  group_by(ablation_condition, light_condition) %>% 
+  ggplot(data = frog_kinematics, mapping = aes(x = ablation_condition, y = actual_angle, color = light_condition)) +geom_point() +geom_path(aes(group = light_condition)) + scale_color_manual(values = c(Dark ="grey5", Light = "grey"))
+```
+
+2) Try an ANOVA of this data (5 pt)
+
+```{r}
+
+model_fit <- lm(actual_angle ~ ablation_condition + light_condition, data = frog_kinematics)
+aov(model_fit) -> anova_model_fit
+summary(anova_model_fit)
+
+```
+
+3) How about a linear model? What information does this give you that an ANOVA can't? (5 pts)
+
+
+```{r}
+
+model_fit <- lm(actual_angle ~ ablation_condition + light_condition, data = frog_kinematics)
+summary(model_fit)
+```
+
+```
+#The linear model gives the residual standard error and the r-squared values. This tells us if our model is actually good at predicting large proportions of our data or not.
+```
+
+3) Plot the lm with the data, with points colored by sex. (10 pts)
+
+
+```{r}
+frog_kinematics %>% 
+  group_by(ablation_condition, light_condition) %>% 
+  ggplot(data = frog_kinematics, mapping = aes(x = ablation_condition, y = actual_angle, color = light_condition)) +geom_point() +geom_path(aes(group = light_condition)) + scale_color_manual(values = c(Dark ="grey5", Light = "grey")) +geom_smooth(method = "lm")
+```
+
+4) Choose any model we've looked at so far, but use two predictor variables. Perform an LM, plot the results, and state if this changes your interpretation of the relationship between variables (10 pts)
+
+```{r}
+
+model_fit_1 <- lm(speed_cm_sec ~ actual_angle + frog_size, data = frog_kinematics)
+
+summary(model_fit_1)
+
+```
+
+```{r}
+augmented_fit <- augment(model_fit_1) 
+
+qqnorm(augmented_fit$.resid)
+
+qqline(augmented_fit$.resid, col = "red")
+```
+
+```
+# THis does not change my interpretation on whether or not there is a relationship between variables because even when adjusting for frog size, there is still a biologically insignificant relationship between angle and velocity.
+```
+
+## Part Three
+
+
+1) Add and commit this document (5 pts)
+
+```
+#Commands here
+```
+
+2) Push your changes to github (10 pts)
+
+```
+#Commands here
+```
+
+
+
+# MS students
+
+My expectation is that you'll do this with your own data. If any part of this doesn't make sense with your data, please get in touch ASAP so we can work it out.
